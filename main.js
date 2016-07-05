@@ -1,4 +1,4 @@
-var map;
+var map, bounds;
 $(function() {
     var nlscmaps = [
         new L.NLSC.PHOTO2(),
@@ -15,6 +15,7 @@ $(function() {
     var baseMaps = {
         '通用版電子地圖': new L.NLSC.EMAP()
     };
+
     // set up the map
     map = new L.Map('map-canvas', {
         center: new L.LatLng(23.1508773, 120.2054415),
@@ -26,6 +27,7 @@ $(function() {
 
 
     $.getJSON('gt.json', function(r) {
+      var arrayOfLatLngs = [];
       for(k in r) {
         if(r[k].points.length > 1) {
           //draw a line
@@ -36,6 +38,7 @@ $(function() {
             if(r[k].points[i].x < 23.427753 && r[k].points[i].x > 22.874693 && r[k].points[i].y < 120.669614 && r[k].points[i].y > 120.021420) {
               var p = L.latLng(parseFloat(r[k].points[i].x), parseFloat(r[k].points[i].y));
               if(p) {
+                arrayOfLatLngs.push(p);
                 line.addLatLng(p);
               }
             }
@@ -45,5 +48,7 @@ $(function() {
           //place a point
         }
       }
+      bounds = new L.LatLngBounds(arrayOfLatLngs);
+      map.fitBounds(bounds);
     });
 })
