@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>台南市垃圾清運地圖</title>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+        <meta charset="utf-8">
+        <meta property="og:title" content="台南區域排水狀態">
+        <meta property="og:description" content="台南區域排水狀態結合水利局提供資訊呈現">
+        <meta property="og:type" content="website">
+        <meta property="og:image" content="http://kiang.github.io/TainanWaterMap/og_image.png">
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <style>
+            html, body {
+                height: 100%;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            #map-canvas {
+                height: 500px;
+                width: 100%;
+            }
+            #title {
+                text-align: center;
+                padding: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            (function (d, s, id) {
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id))
+                    return;
+                js = d.createElement(s);
+                js.id = id;
+                js.src = "//connect.facebook.net/zh_TW/sdk.js#xfbml=1&appId=1393405437614114&version=v2.3";
+                fjs.parentNode.insertBefore(js, fjs);
+            }(document, "script", "facebook-jssdk"));
+        </script>
+        <div class="container">
+            <div class="row">
+                <p class="hidden-sm hidden-xs">&nbsp;</p>
+                <div id="map-canvas" class="col-md-12"></div>
+                <div id="detail" class="col-md-12">
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div class="btn-group btn-group-justified">
+                            <a class="btn btn-primary btn-lg bounds-image" href="#">
+                                即時影像
+                            </a>
+                            <a class="btn btn-primary btn-lg bounds-reset" href="#">
+                                顯示全部
+                            </a>
+                        </div>
+                        <h3 id="title">點選地圖圖示檢視資料</h3>
+                        <div id="pointContent"></div>
+                    </div>
+                    <div class="col-md-4 col-sm-12 col-xs-12">
+                        <p>&nbsp;</p>
+                        <div id="fb-root"></div>
+                        <div class="fb-page" data-href="https://www.facebook.com/k.olc.tw" data-width="800" data-hide-cover="true" data-show-facepile="true" data-show-posts="false"></div>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <a href="https://github.com/kiang/tainan-gt" target="_blank">網站原始碼</a> |
+                <a href="http://data.tainan.gov.tw/dataset/garbage-truck" target="_blank">資料來源</a>
+            </div>
+        </div>
+        <script src="//cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script src="nlsc.js"></script>
+        <script src="main.js"></script>
+    </body>
+</html>
