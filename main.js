@@ -41,10 +41,6 @@ $(function() {
         '通用版電子地圖': new L.NLSC.EMAP()
     };
 
-    $('#bounds-reset').click(function() {
-      alert('hi');
-      return false;
-    });
     // set up the map
     map = new L.Map('map-canvas', {
         center: new L.LatLng(23.1508773, 120.2054415),
@@ -119,7 +115,7 @@ function lineClicked() {
     });
     l.addTo(map);
     markers.push(l._leaflet_id);
-    content += '<tr><th>' + baseData[lastLineId].points[k].data.starttime + '</th><td>' + baseData[lastLineId].points[k].data.pointname + '</td></tr>';
+    content += '<tr><th>' + baseData[lastLineId].points[k].data.starttime + ' ~ ' + baseData[lastLineId].points[k].data.endtime + '</th><td>' + baseData[lastLineId].points[k].data.pointname + '</td></tr>';
   }
   content += '</table>';
   $('#pointContent').html(content);
