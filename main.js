@@ -1,4 +1,14 @@
-var map, bounds;
+var map, bounds, baseData = {}, lastLineId, markers = [];
+var styleBase = {
+    'color': '#00ccff',
+    'weight': 3,
+    'opacity': 1
+};
+var styleHighlight = {
+    'color': '#ffcc00',
+    'weight': 10,
+    'opacity': 1
+};
 $(function() {
     var nlscmaps = [
         new L.NLSC.PHOTO2(),
@@ -29,9 +39,15 @@ $(function() {
     $.getJSON('gt.json', function(r) {
       var arrayOfLatLngs = [];
       for(k in r) {
+        var layerData = {
+          points: [],
+          data: r[k]
+        };
         if(r[k].points.length > 1) {
           //draw a line
-          var line = new L.polyline([]);
+          var options = styleBase;
+          options.id = r[k].trackname;
+          var line = new L.polyline([], options);
           for(i in r[k].points) {
             r[k].points[i].x = parseFloat(r[k].points[i].x);
             r[k].points[i].y = parseFloat(r[k].points[i].y);
@@ -40,10 +56,16 @@ $(function() {
               if(p) {
                 arrayOfLatLngs.push(p);
                 line.addLatLng(p);
+                layerData.points.push({
+                  latlng: p,
+                  data: r[k].points[i]
+                });
               }
             }
           }
+          line.on('click', lineClicked);
           line.addTo(map);
+          baseData[line._leaflet_id] = layerData;
         } else {
           //place a point
         }
@@ -52,3 +74,29 @@ $(function() {
       map.fitBounds(bounds);
     });
 })
+
+function lineClicked() {
+  if(map._layers[lastLineId]) {
+    map._layers[lastLineId].setStyle(styleBase);
+  }
+  for(k in markers) {
+    map.removeLayer(map._layers[markers[k]]);
+  }
+  markers = [];
+  lastLineId = this._leaflet_id;
+  bounds = new L.LatLngBounds(this.getLatLngs());
+  var content = '<table class="table table-boarded">';
+  for(k in baseData[lastLineId].data) {
+    if(typeof(baseData[lastLineId].data[k]) === 'string') {
+      content += '<tr><th>' + k + '</th><td>' + baseData[lastLineId].data[k] + '</td></tr>';
+    }
+  }
+  content += '</table>';
+  $('#pointContent').html(content);
+  for(k in baseData[lastLineId].points) {
+    var l = new L.marker(baseData[lastLineId].points[k].latlng).addTo(map);
+    markers.push(l._leaflet_id);
+  }
+  map.fitBounds(bounds);
+  map._layers[lastLineId].setStyle(styleHighlight).bringToFront();
+}
