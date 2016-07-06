@@ -41,6 +41,10 @@ $(function() {
         '通用版電子地圖': new L.NLSC.EMAP()
     };
 
+    $('#bounds-reset').click(function() {
+      alert('hi');
+      return false;
+    });
     // set up the map
     map = new L.Map('map-canvas', {
         center: new L.LatLng(23.1508773, 120.2054415),
@@ -88,6 +92,7 @@ $(function() {
       bounds = new L.LatLngBounds(arrayOfLatLngs);
       map.fitBounds(bounds);
     });
+
 })
 
 function lineClicked() {
@@ -99,7 +104,7 @@ function lineClicked() {
   }
   markers = [];
   lastLineId = this._leaflet_id;
-  bounds = new L.LatLngBounds(this.getLatLngs());
+  var lineBounds = new L.LatLngBounds(this.getLatLngs());
   var content = '<table class="table table-boarded">';
   for(k in baseData[lastLineId].data) {
     if(typeof(baseData[lastLineId].data[k]) === 'string') {
@@ -118,6 +123,6 @@ function lineClicked() {
   }
   content += '</table>';
   $('#pointContent').html(content);
-  map.fitBounds(bounds);
+  map.fitBounds(lineBounds);
   map._layers[lastLineId].setStyle(styleHighlight).bringToFront();
 }
