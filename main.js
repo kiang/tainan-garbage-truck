@@ -1,8 +1,23 @@
 var map, bounds, baseData = {}, lastLineId, markers = [];
+var labels = {
+  atarea: '行政區',
+  trackname: '路線編號',
+  truckno: '車牌號碼',
+  trucktype: '車型',
+  trucksize: '車種',
+  truckcolor: '顏色',
+  truckcap: '容量(公噸)',
+  truckdriver: '駕駛員姓名',
+  truckdrivercell: '駕駛員電話',
+  truckbeside: '隨車員姓名',
+  truckbesidecell: '隨車員電話',
+  truckdate: '垃圾清運日',
+  truckresource: '資源回收日'
+};
 var styleBase = {
     'color': '#00ccff',
     'weight': 3,
-    'opacity': 1
+    'opacity': 0.5
 };
 var styleHighlight = {
     'color': '#ffcc00',
@@ -88,15 +103,21 @@ function lineClicked() {
   var content = '<table class="table table-boarded">';
   for(k in baseData[lastLineId].data) {
     if(typeof(baseData[lastLineId].data[k]) === 'string') {
-      content += '<tr><th>' + k + '</th><td>' + baseData[lastLineId].data[k] + '</td></tr>';
+      content += '<tr><th>' + labels[k] + '</th><td>' + baseData[lastLineId].data[k] + '</td></tr>';
     }
+  }
+  content += '<tr><th colspan="2" style="text-align: center;">時刻表</th></tr>';
+  for(k in baseData[lastLineId].points) {
+    var l = new L.marker(baseData[lastLineId].points[k].latlng, baseData[lastLineId].points[k].data);
+    l.on('click', function(e) {
+      e.target.bindPopup(e.target.options.starttime + ' - ' + e.target.options.pointname).openPopup();
+    });
+    l.addTo(map);
+    markers.push(l._leaflet_id);
+    content += '<tr><th>' + baseData[lastLineId].points[k].data.starttime + '</th><td>' + baseData[lastLineId].points[k].data.pointname + '</td></tr>';
   }
   content += '</table>';
   $('#pointContent').html(content);
-  for(k in baseData[lastLineId].points) {
-    var l = new L.marker(baseData[lastLineId].points[k].latlng).addTo(map);
-    markers.push(l._leaflet_id);
-  }
   map.fitBounds(bounds);
   map._layers[lastLineId].setStyle(styleHighlight).bringToFront();
 }
