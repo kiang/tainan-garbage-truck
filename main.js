@@ -24,6 +24,7 @@ var styleHighlight = {
     'weight': 10,
     'opacity': 1
 };
+var arrowDecorator;
 $(function() {
     var nlscmaps = [
         new L.NLSC.PHOTO2(),
@@ -97,6 +98,9 @@ function lineClicked() {
   }
   for(k in markers) {
     map.removeLayer(map._layers[markers[k]]);
+    if(arrowDecorator) {
+      map.removeLayer(arrowDecorator);
+    }
   }
   markers = [];
   lastLineId = this._leaflet_id;
@@ -121,4 +125,10 @@ function lineClicked() {
   $('#pointContent').html(content);
   map.fitBounds(lineBounds);
   map._layers[lastLineId].setStyle(styleHighlight).bringToFront();
+  arrowDecorator = L.polylineDecorator(map._layers[lastLineId], {
+    patterns: [
+      // defines a pattern of 10px-wide dashes, repeated every 20px on the line
+      {offset: 0, repeat: 20, symbol: L.Symbol.arrowHead({pixelSize: 10})}
+    ]
+  }).addTo(map);
 }
