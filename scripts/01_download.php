@@ -3,7 +3,7 @@
 info from 06-2686660 #122 洪小姐
 */
 
-$rawPath = __DIR__ . '/raw';
+$rawPath = dirname(__DIR__) . '/raw';
 if(!file_exists($rawPath)) {
   mkdir($rawPath, 0777, true);
 }
