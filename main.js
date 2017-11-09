@@ -165,13 +165,17 @@ positionFeature.setStyle(new ol.style.Style({
   })
 }));
 
+var changeTriggered = false;
 geolocation.on('change:position', function() {
-  var coordinates = geolocation.getPosition();
-  if(coordinates) {
-    positionFeature.setGeometry(new ol.geom.Point(coordinates));
-    var mapView = map.getView();
-    mapView.setCenter(coordinates);
-    mapView.setZoom(17);
+  if(false === changeTriggered) {
+    var coordinates = geolocation.getPosition();
+    if(coordinates) {
+      positionFeature.setGeometry(new ol.geom.Point(coordinates));
+      var mapView = map.getView();
+      mapView.setCenter(coordinates);
+      mapView.setZoom(17);
+    }
+    changeTriggered = true;
   }
 });
 
