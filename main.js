@@ -167,15 +167,15 @@ positionFeature.setStyle(new ol.style.Style({
 
 var changeTriggered = false;
 geolocation.on('change:position', function() {
-  if(false === changeTriggered) {
-    var coordinates = geolocation.getPosition();
-    if(coordinates) {
-      positionFeature.setGeometry(new ol.geom.Point(coordinates));
+  var coordinates = geolocation.getPosition();
+  if(coordinates) {
+    positionFeature.setGeometry(new ol.geom.Point(coordinates));
+    if(false === changeTriggered) {
       var mapView = map.getView();
       mapView.setCenter(coordinates);
       mapView.setZoom(17);
+      changeTriggered = true;
     }
-    changeTriggered = true;
   }
 });
 
