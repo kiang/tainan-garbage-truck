@@ -40,29 +40,6 @@ var layerGreen = new ol.style.Style({
   })
 });
 
-var layerBlue = new ol.style.Style({
-  stroke: new ol.style.Stroke({
-    color: 'blue',
-    width: 3
-  }),
-  fill: new ol.style.Fill({
-    color: 'rgba(0, 0, 255, 0.1)'
-  }),
-  image: new ol.style.RegularShape({
-    fill: new ol.style.Fill({
-        color: 'rgba(0,200,0,0.6)'
-    }),
-    stroke: new ol.style.Stroke({
-        color: 'rgba(0,0,0,0.3)',
-        width: 2
-    }),
-    points: 3,
-    radius: 10,
-    radius2: 4,
-    angle: 0
-  })
-});
-
 var projection = ol.proj.get('EPSG:3857');
 var projectionExtent = projection.getExtent();
 var size = ol.extent.getWidth(projectionExtent) / 256;
@@ -205,8 +182,12 @@ map.on('singleclick', function(evt) {
         message += '收運日： ' + p.dayValue + '<br />';
         message += '回收日： ' + p.recycleDate;
         layer.getSource().forEachFeature(function(f) {
-          if(f.getProperties().lineId == clickedLineId) {
-            f.setStyle(layerBlue);
+          var fp = f.getProperties();
+          if(fp.lineId == clickedLineId) {
+            if(!fp.dayValue) {
+              f.setStyle(styleFunction(f));
+              map.getView().fit(f.getGeometry().getExtent());
+            }
           } else {
             f.setStyle(layerGreen);
           }
@@ -222,3 +203,33 @@ map.on('singleclick', function(evt) {
   }
 
 });
+
+var styleFunction = function(feature) {
+  var geometry = feature.getGeometry();
+  var styles = [
+    // linestring
+    new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: '#ffcc33',
+        width: 2
+      })
+    })
+  ];
+
+  geometry.forEachSegment(function(start, end) {
+    var dx = end[0] - start[0];
+    var dy = end[1] - start[1];
+    var rotation = Math.atan2(dy, dx);
+    // arrows
+    styles.push(new ol.style.Style({
+      geometry: new ol.geom.Point(end),
+      image: new ol.style.Icon({
+        src: 'arrow.png',
+        anchor: [0.75, 0.5],
+        rotateWithView: true,
+        rotation: -rotation
+      })
+    }));
+  });
+  return styles;
+};
