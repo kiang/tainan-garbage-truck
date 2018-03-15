@@ -25,7 +25,7 @@ app.Button = function(opt_options) {
 ol.inherits(app.Button, ol.control.Control);
 
 var layerGreen = new ol.style.Style({
-  image: new ol.style.RegularShape({
+  image: new ol.style.Circle({
     fill: new ol.style.Fill({
         color: 'rgba(0,200,0,0.6)'
     }),
@@ -33,12 +33,11 @@ var layerGreen = new ol.style.Style({
         color: 'rgba(0,0,0,0.3)',
         width: 2
     }),
-    points: 3,
-    radius: 10,
-    radius2: 4,
-    angle: 0
+    radius: 10
   })
 });
+
+var layerBlank = new ol.style.Style();
 
 var projection = ol.proj.get('EPSG:3857');
 var projectionExtent = projection.getExtent();
@@ -71,7 +70,7 @@ var baseLayer = new ol.layer.Tile({
     source: new ol.source.WMTS({
         matrixSet: 'EPSG:3857',
         format: 'image/png',
-        url: 'http://wmts.nlsc.gov.tw/wmts',
+        url: 'https://wmts.nlsc.gov.tw/wmts',
         layer: 'EMAP',
         tileGrid: new ol.tilegrid.WMTS({
             origin: ol.extent.getTopLeft(projectionExtent),
@@ -86,6 +85,7 @@ var baseLayer = new ol.layer.Tile({
 });
 
 var routes = new ol.layer.Vector({
+  id: 'routes',
   source: new ol.source.Vector({
     url: 'routes.json',
     format: new ol.format.GeoJSON()
@@ -163,20 +163,21 @@ new ol.layer.Vector({
   })
 });
 
+var clickedLineId = false;
+var mapFitted = false;
 /**
  * Add a click handler to the map to render the popup.
  */
 map.on('singleclick', function(evt) {
   var coordinate = evt.coordinate;
   var message = '';
-  var weight = 0;
 
   var featureFound = false;
   map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
       var p = feature.getProperties();
       if(false === featureFound && p.scheduleTime) {
         featureFound = true;
-        var clickedLineId = p.lineId;
+        clickedLineId = p.lineId;
         message += '收運點： ' + p.name + '<br />';
         message += '排定時間： ' + p.scheduleTime + '<br />';
         message += '收運日： ' + p.dayValue + '<br />';
@@ -186,10 +187,13 @@ map.on('singleclick', function(evt) {
           if(fp.lineId == clickedLineId) {
             if(!fp.dayValue) {
               f.setStyle(styleFunction(f));
-              map.getView().fit(f.getGeometry().getExtent());
+              if(false === mapFitted) {
+                mapFitted = true;
+                map.getView().fit(f.getGeometry().getExtent());
+              }
             }
           } else {
-            f.setStyle(layerGreen);
+            f.setStyle(layerBlank);
           }
         });
       }
@@ -198,6 +202,16 @@ map.on('singleclick', function(evt) {
     content.innerHTML = message;
     popup.setPosition(coordinate);
   } else {
+    if(false !== clickedLineId && false === featureFound) {
+      clickedLineId = mapFitted = false;
+      map.getLayers().forEach(function(layer) {
+        if(layer.get('id') === 'routes') {
+          layer.getSource().forEachFeature(function(f) {
+            f.setStyle(layerGreen);
+          });
+        }
+      })
+    }
     popup.setPosition(undefined);
     closer.blur();
   }
@@ -210,8 +224,8 @@ var styleFunction = function(feature) {
     // linestring
     new ol.style.Style({
       stroke: new ol.style.Stroke({
-        color: '#ffcc33',
-        width: 2
+        color: '#339933',
+        width: 12
       })
     })
   ];
@@ -220,9 +234,11 @@ var styleFunction = function(feature) {
     var dx = end[0] - start[0];
     var dy = end[1] - start[1];
     var rotation = Math.atan2(dy, dx);
+    var ext = ol.extent.boundingExtent([start,end]);
+
     // arrows
     styles.push(new ol.style.Style({
-      geometry: new ol.geom.Point(end),
+      geometry: new ol.geom.Point(ol.extent.getCenter(ext)),
       image: new ol.style.Icon({
         src: 'arrow.png',
         anchor: [0.75, 0.5],
