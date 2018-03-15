@@ -12,7 +12,6 @@ app.Button = function(opt_options) {
     } else {
       map.getLayers().forEach(function(layer) {
         if(layer.get('id') === 'routes') {
-          mapFitted = false;
           layer.getSource().forEachFeature(function(f) {
             f.setStyle(layerGreen);
           });
@@ -180,7 +179,6 @@ new ol.layer.Vector({
 });
 
 var clickedLineId = false;
-var mapFitted = false;
 /**
  * Add a click handler to the map to render the popup.
  */
@@ -203,10 +201,6 @@ map.on('singleclick', function(evt) {
           if(fp.lineId == clickedLineId) {
             if(!fp.dayValue) {
               f.setStyle(styleFunction(f));
-              if(false === mapFitted) {
-                mapFitted = true;
-                map.getView().fit(f.getGeometry().getExtent());
-              }
             }
           } else {
             f.setStyle(layerBlank);
