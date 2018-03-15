@@ -111,8 +111,8 @@ var map = new ol.Map({
     }),
     new app.Button({
       bClassName: 'app-button2',
-      bText: '力',
-      bHref: 'https://npptw.org/tainan'
+      bText: '江',
+      bHref: 'https://www.facebook.com/k.olc.tw/'
     })
   ])
 });
