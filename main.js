@@ -7,7 +7,18 @@ app.Button = function(opt_options) {
   button.innerHTML = options.bText;
   var this_ = this;
   var handleButtonClick = function() {
-    window.open(options.bHref);
+    if(options.bHref !== '#') {
+      window.open(options.bHref);
+    } else {
+      map.getLayers().forEach(function(layer) {
+        if(layer.get('id') === 'routes') {
+          mapFitted = false;
+          layer.getSource().forEachFeature(function(f) {
+            f.setStyle(layerGreen);
+          });
+        }
+      });
+    }
   };
 
   button.addEventListener('click', handleButtonClick, false);
@@ -113,6 +124,11 @@ var map = new ol.Map({
       bClassName: 'app-button2',
       bText: '江',
       bHref: 'https://www.facebook.com/k.olc.tw/'
+    }),
+    new app.Button({
+      bClassName: 'app-button3',
+      bText: '全',
+      bHref: '#'
     })
   ])
 });
@@ -203,14 +219,7 @@ map.on('singleclick', function(evt) {
     popup.setPosition(coordinate);
   } else {
     if(false !== clickedLineId && false === featureFound) {
-      clickedLineId = mapFitted = false;
-      map.getLayers().forEach(function(layer) {
-        if(layer.get('id') === 'routes') {
-          layer.getSource().forEachFeature(function(f) {
-            f.setStyle(layerGreen);
-          });
-        }
-      })
+      clickedLineId = false;
     }
     popup.setPosition(undefined);
     closer.blur();
