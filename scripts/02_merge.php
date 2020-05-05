@@ -32,7 +32,13 @@ foreach(glob($basePath . '/raw/Route_*.json') AS $jsonFile) {
       $point->geometry->coordinates = $pointVal;
       $fc->features[] = $point;
     }
-    $fc->features[] = $line;
+    if(count($line->geometry->coordinates) > 1) {
+      $fc->features[] = $line;
+    } else {
+      $line->geometry->type = 'Point';
+      $line->geometry->coordinates = $line->geometry->coordinates[0];
+      $fc->features[] = $line;
+    }
   }
 }
 
